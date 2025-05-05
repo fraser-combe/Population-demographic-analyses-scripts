@@ -1,0 +1,26 @@
+model {
+  # Priors for global parameters
+  mu_Phi ~ dnorm(0, 0.01)
+  tau_Phi ~ dgamma(0.01, 0.01)
+  
+  # Time-varying capture probability
+  for (t in 1:T) {
+    p_global[t] ~ dbeta(1, 1)
+  }
+  
+  # Individual-level effects and survival probability
+  for (i in 1:N) {
+    individual_effect[i] ~ dnorm(0, tau_Phi)
+    
+    # Initial survival probability
+    Phi[i,1] ~ dbern(initial_survival_prob)
+    
+    for (t in 2:(T+1)) {
+      # Survival probability with individual effects
+      logit(Phi[i,t]) <- mu_Phi + individual_effect[i]
+      
+      # Observed capture history
+      observed[i,t] ~ dbern(Phi[i,t] * p_global[t-1])
+    }
+  }
+}

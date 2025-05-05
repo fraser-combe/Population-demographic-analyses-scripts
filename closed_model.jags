@@ -1,0 +1,11 @@
+
+  model {
+    for (i in 1:M) {
+      for (t in 1:T) {
+        y[i, t] ~ dbern(p)
+      }
+    }
+    p ~ dbeta(alpha_p, beta_p)
+    N <- M / p
+  }
+  
